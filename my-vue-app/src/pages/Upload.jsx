@@ -2,40 +2,81 @@ import { useState } from "react";
 import { supabase } from "../supabase";
 
 export default function Upload() {
-
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [price, setPrice] = useState("");
-  const [image, setImage] = useState("");
   const [sellerName, setSellerName] = useState("");
   const [phone, setPhone] = useState("");
+
+  const [imageFile, setImageFile] = useState(null);
+  const [agentFile, setAgentFile] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!imageFile || !agentFile) {
+      alert("❌ لازم ترفع صورة وملف");
+      return;
+    }
+
+    // رفع الصورة
+    const imageName = Date.now() + "-" + imageFile.name;
+
+    const { error: imgError } = await supabase.storage
+      .from("agents-files")
+      .upload(imageName, imageFile);
+
+    if (imgError) {
+      console.log(imgError);
+      return;
+    }
+
+    const imageUrl = `${supabase.storage
+      .from("agents-files")
+      .getPublicUrl(imageName).data.publicUrl}`;
+
+    // رفع ملف AI
+    const fileName = Date.now() + "-" + agentFile.name;
+
+    const { error: fileError } = await supabase.storage
+      .from("agents-files")
+      .upload(fileName, agentFile);
+
+    if (fileError) {
+      console.log(fileError);
+      return;
+    }
+
+    const fileUrl = `${supabase.storage
+      .from("agents-files")
+      .getPublicUrl(fileName).data.publicUrl}`;
+
+    // حفظ في الداتابيز
     const { error } = await supabase.from("agents").insert([
       {
         name,
         desc,
         price,
-        image,
+        image: imageUrl,
+        file_url: fileUrl,
         seller_name: sellerName,
         phone,
       },
     ]);
 
     if (error) {
-      alert("❌ Error");
       console.log(error);
+      alert("❌ Error");
     } else {
-      alert("🔥 Uploaded Successfully");
+      alert("🔥 تم رفع المنتج");
 
       setName("");
       setDesc("");
       setPrice("");
-      setImage("");
       setSellerName("");
       setPhone("");
+      setImageFile(null);
+      setAgentFile(null);
     }
   };
 
@@ -52,37 +93,24 @@ export default function Upload() {
         background: "#1e293b",
         padding: "30px",
         borderRadius: "15px",
-        width: "300px"
+        width: "320px"
       }}>
-        <h2 style={{ marginBottom: "20px" }}>Sell Your Agent</h2>
+        <h2>Sell Your AI Agent</h2>
 
-        <input placeholder="Name" value={name} onChange={(e)=>setName(e.target.value)} style={input}/>
-        <input placeholder="Description" value={desc} onChange={(e)=>setDesc(e.target.value)} style={input}/>
-        <input placeholder="Price" value={price} onChange={(e)=>setPrice(e.target.value)} style={input}/>
-        <input placeholder="Image URL" value={image} onChange={(e)=>setImage(e.target.value)} style={input}/>
-        <input placeholder="Your Name" value={sellerName} onChange={(e)=>setSellerName(e.target.value)} style={input}/>
-        <input placeholder="Your Phone" value={phone} onChange={(e)=>setPhone(e.target.value)} style={input}/>
+        <input placeholder="Name" onChange={(e)=>setName(e.target.value)} /><br/><br/>
+        <input placeholder="Description" onChange={(e)=>setDesc(e.target.value)} /><br/><br/>
+        <input placeholder="Price" onChange={(e)=>setPrice(e.target.value)} /><br/><br/>
+        <input placeholder="Your Name" onChange={(e)=>setSellerName(e.target.value)} /><br/><br/>
+        <input placeholder="Phone" onChange={(e)=>setPhone(e.target.value)} /><br/><br/>
 
-        <button type="submit" style={{
-          width: "100%",
-          padding: "10px",
-          background: "#3b82f6",
-          border: "none",
-          borderRadius: "10px",
-          color: "white",
-          cursor: "pointer"
-        }}>
-          Upload
-        </button>
+        <p>📸 Upload Image:</p>
+        <input type="file" onChange={(e)=>setImageFile(e.target.files[0])} /><br/><br/>
+
+        <p>📦 Upload AI File:</p>
+        <input type="file" onChange={(e)=>setAgentFile(e.target.files[0])} /><br/><br/>
+
+        <button type="submit">Upload</button>
       </form>
     </div>
   );
 }
-
-const input = {
-  width: "100%",
-  padding: "10px",
-  marginBottom: "10px",
-  borderRadius: "8px",
-  border: "none"
-};
