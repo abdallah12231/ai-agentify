@@ -17,7 +17,7 @@ export default function Home() {
     <div style={{ padding: "30px" }}>
       <h1>🔥 Top Agents</h1>
 
-      {agents.slice(0, 3).map((a) => (
+      {(agents || []).slice(0, 3).map((a) => (
         <div key={a.id}>
           <h3>{a.name}</h3>
           <p>{a.price}</p>
