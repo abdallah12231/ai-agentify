@@ -53,3 +53,4 @@
     ))}
   </div>
 </nav>
+export default App;
