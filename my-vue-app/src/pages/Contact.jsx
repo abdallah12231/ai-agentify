@@ -1,7 +1,7 @@
 export default function Contact() {
   return (
-    <div style={{ padding: "40px", textAlign: "center" }}>
-      <h1>Contact Us</h1>
+    <div style={{ padding: "30px" }}>
+      <h1>Contact</h1>
       <p>WhatsApp: 01018168377</p>
     </div>
   );

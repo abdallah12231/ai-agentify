@@ -1,100 +1,57 @@
 import { useState } from "react";
+import { supabase } from "../supabase";
 
 export default function Upload() {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [price, setPrice] = useState("");
+  const [image, setImage] = useState("");
+  const [sellerName, setSellerName] = useState("");
+  const [phone, setPhone] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newAgent = { name, desc, price };
-    const oldAgents = JSON.parse(localStorage.getItem("agents")) || [];
+    const { error } = await supabase.from("agents").insert([
+      {
+        name,
+        desc,
+        price,
+        image,
+        seller_name: sellerName,
+        phone,
+      },
+    ]);
 
-    oldAgents.push(newAgent);
-    localStorage.setItem("agents", JSON.stringify(oldAgents));
+    if (error) {
+      alert("❌ Error");
+      console.log(error);
+    } else {
+      alert("🔥 Uploaded");
 
-    alert("🔥 Agent Uploaded");
-
-    setName("");
-    setDesc("");
-    setPrice("");
+      setName("");
+      setDesc("");
+      setPrice("");
+      setImage("");
+      setSellerName("");
+      setPhone("");
+    }
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "linear-gradient(135deg, #0f172a, #020617)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      color: "white"
-    }}>
-      <form onSubmit={handleSubmit} style={{
-        background: "rgba(255,255,255,0.05)",
-        padding: "40px",
-        borderRadius: "20px",
-        width: "320px",
-        backdropFilter: "blur(15px)",
-        boxShadow: "0 0 30px rgba(59,130,246,0.3)"
-      }}>
-        <h2 style={{
-          textAlign: "center",
-          marginBottom: "25px",
-          fontSize: "22px"
-        }}>
-          🚀 Upload AI Agent
-        </h2>
+    <div style={{ padding: "30px" }}>
+      <h1>Upload Agent</h1>
 
-        <input
-          placeholder="Agent Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={input}
-        />
+      <form onSubmit={handleSubmit}>
+        <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} /><br /><br />
+        <input placeholder="Desc" value={desc} onChange={(e) => setDesc(e.target.value)} /><br /><br />
+        <input placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} /><br /><br />
+        <input placeholder="Image URL" value={image} onChange={(e) => setImage(e.target.value)} /><br /><br />
+        <input placeholder="Seller Name" value={sellerName} onChange={(e) => setSellerName(e.target.value)} /><br /><br />
+        <input placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} /><br /><br />
 
-        <input
-          placeholder="Description"
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
-          style={input}
-        />
-
-        <input
-          placeholder="Price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          style={input}
-        />
-
-        <button type="submit" style={{
-          width: "100%",
-          padding: "12px",
-          borderRadius: "12px",
-          border: "none",
-          background: "#3b82f6",
-          color: "white",
-          cursor: "pointer",
-          fontSize: "16px",
-          transition: "0.3s"
-        }}
-        onMouseOver={(e) => e.target.style.transform = "scale(1.05)"}
-        onMouseOut={(e) => e.target.style.transform = "scale(1)"}
-        >
-          Upload Agent
-        </button>
+        <button type="submit">Upload</button>
       </form>
     </div>
   );
 }
-
-const input = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "12px",
-  borderRadius: "10px",
-  border: "none",
-  outline: "none",
-  background: "rgba(255,255,255,0.1)",
-  color: "white"
-};
