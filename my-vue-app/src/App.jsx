@@ -1,49 +1,55 @@
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+<nav style={{
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "20px 40px",
+  background: "rgba(15,23,42,0.7)",
+  backdropFilter: "blur(15px)",
+  borderBottom: "1px solid rgba(255,255,255,0.1)",
+  color: "white",
+  position: "sticky",
+  top: 0,
+  zIndex: 1000
+}}>
+  <h2 style={{
+    color: "#3b82f6",
+    fontWeight: "bold",
+    fontSize: "22px",
+    letterSpacing: "1px"
+  }}>
+    ⚡ AI Agentify
+  </h2>
 
-import Home from "./pages/Home";
-import Browse from "./pages/Browse";
-import Upload from "./pages/Upload";
-import Contact from "./pages/Contact";
-import Admin from "./pages/Admin";
-
-function App() {
-  return (
-    <Router>
-      <div style={{ fontFamily: "Arial" }}>
-
-        {/* Navbar */}
-        <nav style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "20px 40px",
-          background: "rgba(15,23,42,0.8)",
-          color: "white"
-        }}>
-          <h2 style={{ color: "#3b82f6" }}>⚡ AI Agentify</h2>
-
-          <div style={{ display: "flex", gap: "15px" }}>
-            <Link to="/">Home</Link>
-            <Link to="/browse">Browse</Link>
-            <Link to="/upload">Sell</Link>
-            <Link to="/contact">Contact</Link>
-          </div>
-        </nav>
-
-        {/* Routes */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/browse" element={<Browse />} />
-          <Route path="/upload" element={<Upload />} />
-          <Route path="/contact" element={<Contact />} />
-
-          {/* 🔐 Admin مخفي */}
-          <Route path="/admin-9271-secret" element={<Admin />} />
-        </Routes>
-
-      </div>
-    </Router>
-  );
-}
-
-export default App;
+  <div style={{ display: "flex", gap: "15px" }}>
+    {[
+      { name: "Home", path: "/" },
+      { name: "Browse", path: "/browse" },
+      { name: "Sell", path: "/upload" },
+      { name: "Contact", path: "/contact" }
+    ].map((item, i) => (
+      <Link key={i} to={item.path}>
+        <button
+          style={{
+            padding: "10px 18px",
+            borderRadius: "12px",
+            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.05)",
+            color: "white",
+            cursor: "pointer",
+            transition: "0.3s"
+          }}
+          onMouseOver={(e) => {
+            e.target.style.background = "#3b82f6";
+            e.target.style.transform = "scale(1.05)";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.background = "rgba(255,255,255,0.05)";
+            e.target.style.transform = "scale(1)";
+          }}
+        >
+          {item.name}
+        </button>
+      </Link>
+    ))}
+  </div>
+</nav>

@@ -14,7 +14,7 @@ export default function Browse() {
   }, []);
 
   const handleBuy = (agent) => {
-    const message = `Hi, I want to buy ${agent.name} for ${agent.price}`;
+    const message = `Hi, I want to buy ${agent.name}`;
     const phoneNumber = "201018168377";
 
     window.open(
@@ -26,38 +26,48 @@ export default function Browse() {
   return (
     <div style={{
       padding: "40px",
-      background: "#0f172a",
+      background: "linear-gradient(135deg, #020617, #0f172a)",
       minHeight: "100vh",
       color: "white"
     }}>
-      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
-        🚀 Browse AI Agents
+      <h1 style={{ textAlign: "center", marginBottom: "40px" }}>
+        🚀 Discover AI Agents
       </h1>
 
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-        gap: "20px"
+        gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+        gap: "25px"
       }}>
         {agents.map((a) => (
           <div key={a.id} style={{
-            background: "#1e293b",
+            background: "rgba(255,255,255,0.05)",
+            borderRadius: "20px",
             padding: "20px",
-            borderRadius: "15px",
-            boxShadow: "0 0 10px rgba(0,0,0,0.3)"
-          }}>
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            transition: "0.3s"
+          }}
+          onMouseOver={(e)=> e.currentTarget.style.transform="scale(1.03)"}
+          onMouseOut={(e)=> e.currentTarget.style.transform="scale(1)"}
+          >
 
-            {a.image && (
-              <img src={a.image} style={{
-                width: "100%",
-                borderRadius: "10px",
-                marginBottom: "10px"
-              }} />
-            )}
+            <img src={a.image} style={{
+              width: "100%",
+              height: "160px",
+              objectFit: "cover",
+              borderRadius: "15px",
+              marginBottom: "15px"
+            }} />
 
             <h2>{a.name}</h2>
-            <p style={{ color: "#94a3b8" }}>{a.desc}</p>
-            <p style={{ marginTop: "10px", fontWeight: "bold" }}>
+            <p style={{ color: "#94a3b8", fontSize: "14px" }}>{a.desc}</p>
+
+            <p style={{
+              marginTop: "10px",
+              fontWeight: "bold",
+              fontSize: "18px"
+            }}>
               💰 {a.price}
             </p>
 
@@ -66,17 +76,14 @@ export default function Browse() {
               style={{
                 marginTop: "15px",
                 width: "100%",
-                padding: "10px",
-                background: "#3b82f6",
+                padding: "12px",
+                background: "linear-gradient(90deg, #3b82f6, #2563eb)",
                 border: "none",
-                borderRadius: "10px",
+                borderRadius: "12px",
                 color: "white",
                 cursor: "pointer",
-                fontSize: "16px",
-                transition: "0.3s"
+                fontSize: "15px"
               }}
-              onMouseOver={(e) => e.target.style.transform = "scale(1.05)"}
-              onMouseOut={(e) => e.target.style.transform = "scale(1)"}
             >
               Buy Now
             </button>
