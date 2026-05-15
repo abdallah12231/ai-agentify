@@ -15,22 +15,17 @@ export default function Browse() {
 
   const handleBuy = (agent) => {
     const message = `Hi, I want to buy ${agent.name} for ${agent.price}`;
-    const phoneNumber = "201018168377"; // رقمك أنت
+    const phoneNumber = "201018168377";
 
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
+    window.open(
+      `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`,
+      "_blank"
+    );
   };
 
   return (
-    <div style={{
-      padding: "40px",
-      background: "#0f172a",
-      minHeight: "100vh",
-      color: "white"
-    }}>
-      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
-        🚀 Browse AI Agents
-      </h1>
+    <div style={{ padding: "40px", background: "#0f172a", color: "white" }}>
+      <h1>Browse Agents</h1>
 
       <div style={{
         display: "grid",
@@ -41,36 +36,23 @@ export default function Browse() {
           <div key={a.id} style={{
             background: "#1e293b",
             padding: "20px",
-            borderRadius: "15px"
+            borderRadius: "10px"
           }}>
 
-            {a.image && (
-              <img src={a.image} style={{
-                width: "100%",
-                borderRadius: "10px",
-                marginBottom: "10px"
-              }} />
-            )}
+            {a.image && <img src={a.image} style={{ width: "100%" }} />}
 
-            <h2>{a.name}</h2>
-            <p style={{ color: "#94a3b8" }}>{a.desc}</p>
+            <h3>{a.name}</h3>
+            <p>{a.desc}</p>
             <p>💰 {a.price}</p>
 
-            <button
-              onClick={() => handleBuy(a)}
-              style={{
-                marginTop: "15px",
-                width: "100%",
-                padding: "10px",
-                background: "#3b82f6",
-                border: "none",
-                borderRadius: "10px",
-                color: "white",
-                cursor: "pointer"
-              }}
-            >
+            <button onClick={() => handleBuy(a)}>
               Buy Now
             </button>
+
+            <a href={a.file_url} target="_blank">
+              <button>Download</button>
+            </a>
+
           </div>
         ))}
       </div>

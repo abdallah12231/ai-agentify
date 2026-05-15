@@ -14,45 +14,34 @@ export default function Upload() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!name || !desc || !price) {
+      alert("املأ البيانات");
+      return;
+    }
+
     if (!imageFile || !agentFile) {
-      alert("❌ لازم ترفع صورة وملف");
+      alert("ارفع صورة وملف");
       return;
     }
 
     // رفع الصورة
-    const imageName = Date.now() + "-" + imageFile.name;
+    const imgName = Date.now() + imageFile.name;
+    await supabase.storage.from("agents-files").upload(imgName, imageFile);
 
-    const { error: imgError } = await supabase.storage
+    const imageUrl = supabase.storage
       .from("agents-files")
-      .upload(imageName, imageFile);
+      .getPublicUrl(imgName).data.publicUrl;
 
-    if (imgError) {
-      console.log(imgError);
-      return;
-    }
+    // رفع الملف
+    const fileName = Date.now() + agentFile.name;
+    await supabase.storage.from("agents-files").upload(fileName, agentFile);
 
-    const imageUrl = `${supabase.storage
+    const fileUrl = supabase.storage
       .from("agents-files")
-      .getPublicUrl(imageName).data.publicUrl}`;
+      .getPublicUrl(fileName).data.publicUrl;
 
-    // رفع ملف AI
-    const fileName = Date.now() + "-" + agentFile.name;
-
-    const { error: fileError } = await supabase.storage
-      .from("agents-files")
-      .upload(fileName, agentFile);
-
-    if (fileError) {
-      console.log(fileError);
-      return;
-    }
-
-    const fileUrl = `${supabase.storage
-      .from("agents-files")
-      .getPublicUrl(fileName).data.publicUrl}`;
-
-    // حفظ في الداتابيز
-    const { error } = await supabase.from("agents").insert([
+    // حفظ
+    await supabase.from("agents").insert([
       {
         name,
         desc,
@@ -60,57 +49,31 @@ export default function Upload() {
         image: imageUrl,
         file_url: fileUrl,
         seller_name: sellerName,
-        phone,
-      },
+        phone
+      }
     ]);
 
-    if (error) {
-      console.log(error);
-      alert("❌ Error");
-    } else {
-      alert("🔥 تم رفع المنتج");
-
-      setName("");
-      setDesc("");
-      setPrice("");
-      setSellerName("");
-      setPhone("");
-      setImageFile(null);
-      setAgentFile(null);
-    }
+    alert("تم الرفع 🔥");
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#0f172a",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      color: "white"
-    }}>
-      <form onSubmit={handleSubmit} style={{
-        background: "#1e293b",
-        padding: "30px",
-        borderRadius: "15px",
-        width: "320px"
-      }}>
-        <h2>Sell Your AI Agent</h2>
+    <div style={{ padding: "30px" }}>
+      <h1>Sell</h1>
 
-        <input placeholder="Name" onChange={(e)=>setName(e.target.value)} /><br/><br/>
-        <input placeholder="Description" onChange={(e)=>setDesc(e.target.value)} /><br/><br/>
-        <input placeholder="Price" onChange={(e)=>setPrice(e.target.value)} /><br/><br/>
-        <input placeholder="Your Name" onChange={(e)=>setSellerName(e.target.value)} /><br/><br/>
-        <input placeholder="Phone" onChange={(e)=>setPhone(e.target.value)} /><br/><br/>
+      <input placeholder="Name" onChange={(e)=>setName(e.target.value)} /><br/>
+      <input placeholder="Desc" onChange={(e)=>setDesc(e.target.value)} /><br/>
+      <input placeholder="Price" onChange={(e)=>setPrice(e.target.value)} /><br/>
+      <input placeholder="Your Name" onChange={(e)=>setSellerName(e.target.value)} /><br/>
+      <input placeholder="Phone" onChange={(e)=>setPhone(e.target.value)} /><br/>
 
-        <p>📸 Upload Image:</p>
-        <input type="file" onChange={(e)=>setImageFile(e.target.files[0])} /><br/><br/>
+      <p>Image</p>
+      <input type="file" onChange={(e)=>setImageFile(e.target.files[0])} />
 
-        <p>📦 Upload AI File:</p>
-        <input type="file" onChange={(e)=>setAgentFile(e.target.files[0])} /><br/><br/>
+      <p>File</p>
+      <input type="file" onChange={(e)=>setAgentFile(e.target.files[0])} />
 
-        <button type="submit">Upload</button>
-      </form>
+      <br/><br/>
+      <button onClick={handleSubmit}>Upload</button>
     </div>
   );
 }
