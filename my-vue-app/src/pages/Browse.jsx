@@ -14,77 +14,51 @@ export default function Browse() {
   }, []);
 
   const handleBuy = (agent) => {
-    const message = `Hi, I want to buy ${agent.name}`;
-    const phoneNumber = "201018168377";
-
-    window.open(
-      `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`,
-      "_blank"
-    );
+    localStorage.setItem("selectedAgent", JSON.stringify(agent));
+    window.location.href = "/checkout";
   };
 
   return (
     <div style={{
       padding: "40px",
-      background: "linear-gradient(135deg, #020617, #0f172a)",
+      background: "#0f172a",
       minHeight: "100vh",
       color: "white"
     }}>
-      <h1 style={{ textAlign: "center", marginBottom: "40px" }}>
-        🚀 Discover AI Agents
+      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
+        🚀 Browse AI Agents
       </h1>
 
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-        gap: "25px"
+        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+        gap: "20px"
       }}>
         {agents.map((a) => (
           <div key={a.id} style={{
-            background: "rgba(255,255,255,0.05)",
-            borderRadius: "20px",
+            background: "#1e293b",
             padding: "20px",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            transition: "0.3s"
-          }}
-          onMouseOver={(e)=> e.currentTarget.style.transform="scale(1.03)"}
-          onMouseOut={(e)=> e.currentTarget.style.transform="scale(1)"}
-          >
+            borderRadius: "15px"
+          }}>
 
             <img src={a.image} style={{
               width: "100%",
-              height: "160px",
-              objectFit: "cover",
-              borderRadius: "15px",
-              marginBottom: "15px"
+              borderRadius: "10px"
             }} />
 
             <h2>{a.name}</h2>
-            <p style={{ color: "#94a3b8", fontSize: "14px" }}>{a.desc}</p>
+            <p>{a.desc}</p>
+            <p>💰 {a.price}</p>
 
-            <p style={{
-              marginTop: "10px",
-              fontWeight: "bold",
-              fontSize: "18px"
+            <button onClick={() => handleBuy(a)} style={{
+              width: "100%",
+              padding: "10px",
+              background: "#3b82f6",
+              border: "none",
+              borderRadius: "10px",
+              color: "white",
+              cursor: "pointer"
             }}>
-              💰 {a.price}
-            </p>
-
-            <button
-              onClick={() => handleBuy(a)}
-              style={{
-                marginTop: "15px",
-                width: "100%",
-                padding: "12px",
-                background: "linear-gradient(90deg, #3b82f6, #2563eb)",
-                border: "none",
-                borderRadius: "12px",
-                color: "white",
-                cursor: "pointer",
-                fontSize: "15px"
-              }}
-            >
               Buy Now
             </button>
 
