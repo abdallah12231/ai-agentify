@@ -14,51 +14,68 @@ export default function Upload() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !desc || !price) {
-      alert("املأ البيانات");
-      return;
-    }
-
-    if (!imageFile || !agentFile) {
-      alert("ارفع صورة وملف");
-      return;
-    }
-
-    // رفع الصورة
-    const imgName = Date.now() + imageFile.name;
-    await supabase.storage.from("agents-files").upload(imgName, imageFile);
-
-    const imageUrl = supabase.storage
-      .from("agents-files")
-      .getPublicUrl(imgName).data.publicUrl;
-
-    // رفع الملف
-    const fileName = Date.now() + agentFile.name;
-    await supabase.storage.from("agents-files").upload(fileName, agentFile);
-
-    const fileUrl = supabase.storage
-      .from("agents-files")
-      .getPublicUrl(fileName).data.publicUrl;
-
-    // حفظ
-    await supabase.from("agents").insert([
-      {
-        name,
-        desc,
-        price,
-        image: imageUrl,
-        file_url: fileUrl,
-        seller_name: sellerName,
-        phone
+    try {
+      if (!name || !desc || !price) {
+        alert("املأ البيانات");
+        return;
       }
-    ]);
 
-    alert("تم الرفع 🔥");
+      if (!imageFile || !agentFile) {
+        alert("ارفع صورة وملف");
+        return;
+      }
+
+      // رفع الصورة
+      const imgName = Date.now() + imageFile.name;
+
+      const { error: imgError } = await supabase.storage
+        .from("agents-files")
+        .upload(imgName, imageFile);
+
+      if (imgError) throw imgError;
+
+      const imageUrl = supabase.storage
+        .from("agents-files")
+        .getPublicUrl(imgName).data.publicUrl;
+
+      // رفع الملف
+      const fileName = Date.now() + agentFile.name;
+
+      const { error: fileError } = await supabase.storage
+        .from("agents-files")
+        .upload(fileName, agentFile);
+
+      if (fileError) throw fileError;
+
+      const fileUrl = supabase.storage
+        .from("agents-files")
+        .getPublicUrl(fileName).data.publicUrl;
+
+      // حفظ في DB
+      const { error } = await supabase.from("agents").insert([
+        {
+          name,
+          desc,
+          price,
+          image: imageUrl,
+          file_url: fileUrl,
+          seller_name: sellerName,
+          phone
+        }
+      ]);
+
+      if (error) throw error;
+
+      alert("تم الرفع 🔥");
+    } catch (err) {
+      console.log(err);
+      alert("في مشكلة حصلت");
+    }
   };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h1>Sell</h1>
+    <div style={{ padding: "30px", color: "white", background: "#0f172a", minHeight: "100vh" }}>
+      <h1>Sell Your AI</h1>
 
       <input placeholder="Name" onChange={(e)=>setName(e.target.value)} /><br/>
       <input placeholder="Desc" onChange={(e)=>setDesc(e.target.value)} /><br/>
