@@ -1,4 +1,4 @@
-ذimport { Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 <nav style={{
   display: "flex",
   justifyContent: "space-between",
