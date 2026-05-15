@@ -4,19 +4,19 @@ import Home from "./pages/Home";
 import Browse from "./pages/Browse";
 import Upload from "./pages/Upload";
 import Contact from "./pages/Contact";
-import Admin from "./pages/Admin";
-import Checkout from "./pages/Checkout";
+import Pay from "./pages/Pay";
+import AdminOrders from "./pages/AdminOrders";
 
 function App() {
   return (
     <Router>
-      <div style={{ fontFamily: "Arial" }}>
+      <div>
 
         <nav style={{
           display: "flex",
           justifyContent: "space-between",
           padding: "20px 40px",
-          background: "rgba(15,23,42,0.7)",
+          background: "#0f172a",
           color: "white"
         }}>
           <h2 style={{ color: "#3b82f6" }}>⚡ AI Agentify</h2>
@@ -35,11 +35,11 @@ function App() {
           <Route path="/upload" element={<Upload />} />
           <Route path="/contact" element={<Contact />} />
 
-          {/* Admin مخفي */}
-          <Route path="/admin-9271-secret" element={<Admin />} />
+          {/* الدفع */}
+          <Route path="/pay" element={<Pay />} />
 
-          {/* Checkout */}
-          <Route path="/checkout" element={<Checkout />} />
+          {/* Admin مخفي */}
+          <Route path="/admin-orders-secret" element={<AdminOrders />} />
         </Routes>
 
       </div>

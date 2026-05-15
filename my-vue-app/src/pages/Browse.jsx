@@ -15,7 +15,7 @@ export default function Browse() {
 
   const handleBuy = (agent) => {
     localStorage.setItem("selectedAgent", JSON.stringify(agent));
-    window.location.href = "/checkout";
+    window.location.href = "/pay";
   };
 
   return (
@@ -40,7 +40,6 @@ export default function Browse() {
             padding: "20px",
             borderRadius: "15px"
           }}>
-
             <img src={a.image} style={{
               width: "100%",
               borderRadius: "10px"
@@ -61,7 +60,6 @@ export default function Browse() {
             }}>
               Buy Now
             </button>
-
           </div>
         ))}
       </div>
