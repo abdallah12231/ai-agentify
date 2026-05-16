@@ -28,16 +28,16 @@ export default function Pay() {
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = fileName; // الرفع المباشر على الـ Root لتفادي مشاكل الفولدرات الفرعية
 
-      // 1. رفع الصورة إلى الـ Storage bucket
+      // 1. رفع الصورة إلى الـ Storage bucket الحقيقي بتاعك
       const { error: storageError } = await supabase.storage
-        .from('agentify') // تأكد إن اسمه 'agentify' جوه السوبابيز ومعمول Public
+        .from('agents-files') // <-- تم التعديل لاسم الـ Bucket بتاعك المظبوط
         .upload(filePath, screenshot);
 
       if (storageError) throw storageError;
 
       // 2. جلب رابط الصورة المباشر بعد الرفع
       const { data: { publicUrl } } = supabase.storage
-        .from('agentify')
+        .from('agents-files') // <-- تم التعديل لاسم الـ Bucket بتاعك المظبوط
         .getPublicUrl(filePath);
 
       // 3. حفظ بيانات الأوردر كاملة في جدول الـ orders
@@ -68,7 +68,7 @@ export default function Pay() {
     }
   };
 
-  if (!agent) return <h2 style={{ color: "white", textDirection: "rtl" }}>جاري التحميل...</h2>;
+  if (!agent) return <h2 style={{ color: "white", textAlign: "center", marginTop: "20px" }}>جاري التحميل...</h2>;
 
   return (
     <div style={{
@@ -137,4 +137,29 @@ export default function Pay() {
           marginTop: "10px",
           width: "100%",
           padding: "12px",
-          background: loading ? "#475569" : "#3b82f6
+          background: loading ? "#475569" : "#3b82f6",
+          border: "none",
+          borderRadius: "10px",
+          color: "white",
+          fontSize: "16px",
+          fontWeight: "bold",
+          cursor: loading ? "not-allowed" : "pointer",
+          transition: "background 0.2s"
+        }}>
+          {loading ? "جاري إرسال الطلب..." : "تأكيد الدفع ✨"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+const inputStyle = {
+  width: "100%",
+  padding: "10px",
+  borderRadius: "8px",
+  border: "1px solid #334155",
+  background: "#0f172a",
+  color: "white",
+  outline: "none",
+  boxSizing: "border-box"
+};
