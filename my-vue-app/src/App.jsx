@@ -15,6 +15,8 @@ import AdminOrders from "./pages/AdminOrders";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
+  const role = localStorage.getItem("role");
+
   return (
     <Router>
       <div>
@@ -32,7 +34,12 @@ function App() {
           <div style={{ display: "flex", gap: "15px" }}>
             <Link to="/" style={link}>Home</Link>
             <Link to="/browse" style={link}>Browse</Link>
-            <Link to="/upload" style={link}>Sell</Link>
+
+            {/* يظهر للبائع فقط */}
+            {role === "seller" && (
+              <Link to="/upload" style={link}>Sell</Link>
+            )}
+
             <Link to="/contact" style={link}>Contact</Link>
             <Link to="/my-orders" style={link}>My Orders</Link>
             <Link to="/login" style={link}>Login</Link>
@@ -48,7 +55,7 @@ function App() {
 
           {/* 🔐 Protected */}
           <Route path="/upload" element={
-            <ProtectedRoute>
+            <ProtectedRoute roleRequired="seller">
               <Upload />
             </ProtectedRoute>
           } />
@@ -70,7 +77,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/choose-role" element={<ChooseRole />} />
 
-          {/* Admin مخفي */}
+          {/* Admin */}
           <Route path="/admin-orders-secret" element={<AdminOrders />} />
 
         </Routes>
