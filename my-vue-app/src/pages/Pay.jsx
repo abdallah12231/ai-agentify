@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase";
 
-export default function Pay() { // <-- تأكد إن السطر ده مكتوب كدة بالظبط
+export default function Pay() {
   const [agent, setAgent] = useState(null);
   const [userPhone, setUserPhone] = useState("");
   const [screenshot, setScreenshot] = useState(null);
@@ -16,46 +16,59 @@ export default function Pay() { // <-- تأكد إن السطر ده مكتوب 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("🔥 CLICKED");
-
     if (!userPhone || !screenshot) {
-      alert("املأ البيانات");
+      alert("⚠️ رجاءً املأ جميع البيانات (الرقم وصورة التحويل)");
       return;
     }
 
     setLoading(true);
 
     try {
-      console.log("🚀 start");
+      const fileExt = screenshot.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = fileName; // الرفع المباشر على الـ Root لتفادي مشاكل الفولدرات الفرعية
 
-      // test insert بس (من غير upload) عشان نعزل المشكلة
-      const { error } = await supabase
-        .from("orders")
-        .insert([
-          {
-            phone: userPhone,
-            agent_name: "test",
-            price: "100"
-          }
-        ]);
+      // 1. رفع الصورة إلى الـ Storage bucket
+      const { error: storageError } = await supabase.storage
+        .from('agentify') // تأكد إن اسمه 'agentify' جوه السوبابيز ومعمول Public
+        .upload(filePath, screenshot);
 
-      if (error) {
-        console.log("❌ DB ERROR:", error);
-        alert(error.message);
-        return;
-      }
+      if (storageError) throw storageError;
 
-      alert("✅ اشتغل وجدول الـ Database سليم!");
+      // 2. جلب رابط الصورة المباشر بعد الرفع
+      const { data: { publicUrl } } = supabase.storage
+        .from('agentify')
+        .getPublicUrl(filePath);
+
+      // 3. حفظ بيانات الأوردر كاملة في جدول الـ orders
+      const { error: dbError } = await supabase
+        .from('orders')
+        .insert([{
+          phone: userPhone,
+          agent_name: agent.name,
+          price: agent.price,
+          screenshot_url: publicUrl,
+          status: "pending"
+        }]);
+
+      if (dbError) throw dbError;
+
+      alert("✅ تم إرسال طلبك وصورة التحويل بنجاح!");
+
+      // تصفير الفورم بعد النجاح
+      setUserPhone("");
+      setScreenshot(null);
+      setPreview(null);
 
     } catch (err) {
-      console.log("❌ CATCH:", err);
-      alert("error");
+      console.error("Error details:", err);
+      alert("❌ خطأ: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!agent) return <h2 style={{ color: "white" }}>Loading...</h2>;
+  if (!agent) return <h2 style={{ color: "white", textDirection: "rtl" }}>جاري التحميل...</h2>;
 
   return (
     <div style={{
@@ -64,61 +77,64 @@ export default function Pay() { // <-- تأكد إن السطر ده مكتوب 
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      color: "white"
+      color: "white",
+      fontFamily: "sans-serif"
     }}>
       <form onSubmit={handleSubmit} style={{
         background: "#1e293b",
         padding: "30px",
         borderRadius: "15px",
-        width: "320px"
+        width: "340px",
+        direction: "rtl" // عشان التنسيق العربي يظبط
       }}>
-        <h2>💰 Payment Test</h2>
+        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>💰 إتمام الدفع</h2>
 
-        <p>Product: <strong>{agent.name}</strong></p>
-        <p>Price: <strong>{agent.price}</strong></p>
+        <div style={{ marginBottom: "15px", borderBottom: "1px solid #334155", paddingBottom: "10px" }}>
+          <p>المنتج: <strong style={{ color: "#3b82f6" }}>{agent.name}</strong></p>
+          <p>السعر: <strong style={{ color: "#10b981" }}>{agent.price} EGP</strong></p>
+        </div>
 
-        <p>حول على:</p>
-        <h3 style={{ color: "#3b82f6" }}>01018168377</h3>
+        <div style={{ background: "#0f172a", padding: "10px", borderRadius: "10px", textAlign: "center", marginBottom: "15px" }}>
+          <p style={{ margin: "5px 0", fontSize: "14px" }}>قم بالتحويل على رقم فودافون كاش التالي:</p>
+          <h3 style={{ color: "#3b82f6", margin: "5px 0", letterSpacing: "1px" }}>01018168377</h3>
+        </div>
 
-        <input
-          placeholder="رقمك"
-          value={userPhone}
-          onChange={(e) => setUserPhone(e.target.value)}
-          style={input}
-        />
+        <div style={{ marginBottom: "15px" }}>
+          <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>رقم الموبايل الذي قمت بالتحويل منه:</label>
+          <input
+            type="text"
+            placeholder="01xxxxxxxxx"
+            value={userPhone}
+            onChange={(e) => setUserPhone(e.target.value)}
+            style={inputStyle}
+          />
+        </div>
 
-        <input
-          type="file"
-          onChange={(e) => {
-            const file = e.target.files[0];
-            setScreenshot(file);
-            setPreview(URL.createObjectURL(file));
-          }}
-        />
+        <div style={{ marginBottom: "15px" }}>
+          <label style={{ display: "block", marginBottom: "5px", fontSize: "14px" }}>ارفع لقطة شاشة (Screenshot) للتحويل:</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                setScreenshot(file);
+                setPreview(URL.createObjectURL(file));
+              }
+            }}
+            style={{ width: "100%", color: "#94a3b8" }}
+          />
+        </div>
 
-        {preview && <img src={preview} style={{ width: "100%", marginTop: "10px" }} />}
+        {preview && (
+          <div style={{ textAlign: "center", marginTop: "10px", marginBottom: "15px" }}>
+            <p style={{ fontSize: "12px", color: "#94a3b8", margin: "5px 0" }}>معاينة الصورة:</p>
+            <img src={preview} alt="Preview" style={{ width: "100%", maxHeight: "150px", objectFit: "contain", borderRadius: "8px" }} />
+          </div>
+        )}
 
         <button type="submit" disabled={loading} style={{
           marginTop: "10px",
           width: "100%",
-          padding: "10px",
-          background: loading ? "#475569" : "#3b82f6",
-          border: "none",
-          borderRadius: "10px",
-          color: "white",
-          cursor: "pointer"
-        }}>
-          {loading ? "جاري التجربة..." : "Confirm Test"}
-        </button>
-      </form>
-    </div>
-  );
-}
-
-const input = {
-  width: "100%",
-  padding: "10px",
-  margin: "10px 0",
-  borderRadius: "10px",
-  border: "none"
-};
+          padding: "12px",
+          background: loading ? "#475569" : "#3b82f6
