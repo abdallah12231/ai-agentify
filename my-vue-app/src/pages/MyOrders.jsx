@@ -40,16 +40,9 @@ export default function MyOrders() {
           <p>💰 {o.price}</p>
           <p>📌 الحالة: {o.status}</p>
 
-          {o.status === "approved" && (
+          {o.status === "approved" && o.file_url && (
             <a href={o.file_url} target="_blank">
-              <button style={{
-                marginTop: "10px",
-                padding: "10px",
-                background: "#22c55e",
-                border: "none",
-                borderRadius: "10px",
-                color: "white"
-              }}>
+              <button style={downloadBtn}>
                 Download 🔥
               </button>
             </a>
@@ -59,3 +52,13 @@ export default function MyOrders() {
     </div>
   );
 }
+
+const downloadBtn = {
+  marginTop: "10px",
+  padding: "10px",
+  background: "#22c55e",
+  border: "none",
+  borderRadius: "10px",
+  color: "white",
+  cursor: "pointer"
+};
