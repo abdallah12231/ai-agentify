@@ -10,7 +10,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ChooseRole from "./pages/ChooseRole";
 
+import MyOrders from "./pages/MyOrders";
 import AdminOrders from "./pages/AdminOrders";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -21,7 +23,6 @@ function App() {
         <nav style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
           padding: "15px 40px",
           background: "#0f172a",
           color: "white"
@@ -33,25 +34,45 @@ function App() {
             <Link to="/browse" style={link}>Browse</Link>
             <Link to="/upload" style={link}>Sell</Link>
             <Link to="/contact" style={link}>Contact</Link>
+            <Link to="/my-orders" style={link}>My Orders</Link>
             <Link to="/login" style={link}>Login</Link>
           </div>
         </nav>
 
-        {/* 🔥 Pages */}
+        {/* 🔥 Routes */}
         <Routes>
+
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<Browse />} />
-          <Route path="/upload" element={<Upload />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/pay" element={<Pay />} />
+
+          {/* 🔐 Protected */}
+          <Route path="/upload" element={
+            <ProtectedRoute>
+              <Upload />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/pay" element={
+            <ProtectedRoute>
+              <Pay />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/my-orders" element={
+            <ProtectedRoute>
+              <MyOrders />
+            </ProtectedRoute>
+          } />
 
           {/* Auth */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/choose-role" element={<ChooseRole />} />
 
-          {/* Admin (مخفي) */}
+          {/* Admin مخفي */}
           <Route path="/admin-orders-secret" element={<AdminOrders />} />
+
         </Routes>
 
       </div>
